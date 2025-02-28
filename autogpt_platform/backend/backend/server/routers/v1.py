@@ -615,7 +615,9 @@ async def get_graph_execution(
     graph_exec_id: str,
     user_id: Annotated[str, Depends(get_user_id)],
 ) -> graph_db.GraphExecution:
-    graph = await graph_db.get_graph(graph_id, user_id=user_id)
+    graph = await graph_db.get_graph(
+        graph_id, user_id=user_id, ignore_ownership_if_listed_in_marketplace=True
+    )
     if not graph:
         raise HTTPException(status_code=404, detail=f"Graph #{graph_id} not found.")
 
@@ -648,7 +650,10 @@ async def create_schedule(
     schedule: ScheduleCreationRequest,
 ) -> scheduler.JobInfo:
     graph = await graph_db.get_graph(
-        schedule.graph_id, schedule.graph_version, user_id=user_id
+        schedule.graph_id,
+        schedule.graph_version,
+        user_id=user_id,
+        ignore_ownership_if_listed_in_marketplace=True,
     )
     if not graph:
         raise HTTPException(
